@@ -1,6 +1,6 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import BlogList from './blogs/BlogList';
+import React from "react";
+import { Link } from "react-router-dom";
+import BlogList from "./blogs/BlogList";
 
 const Dashboard = () => {
   return (
