@@ -1,0 +1,29 @@
+language: node_js
+node_js:
+  - "8"
+dist: trusty
+services:
+  - mongodb
+  - redis-server
+env:
+  - NODE_ENV=ci PORT=3000
+  #save the node_modules dir to speed up the build process
+cache:
+  directories:
+    - node_modules
+    - client/node_modules
+
+    # install server and client files
+install:
+  - npm install
+  - npm run build
+script:
+  # nohup: tif shell is closed dont kill anything this commands creates
+  # & : run command in background
+  - nohup npm run start &
+
+  # wait for 3 seconds
+  - sleep 3
+
+  # run tests
+  - npm run test

@@ -3,13 +3,13 @@
 //implement caching in an unique manner
 const mongoose = require("mongoose");
 const redis = require("redis");
+const keys = require("../config/keys");
 
 //this is requeri to promisify redis client
 const util = require("util");
 
 //setting up redis
-const redisUrl = "redis://127.0.0.1:6379";
-const client = redis.createClient(redisUrl);
+const client = redis.createClient(keys.redisUrl);
 
 //promisifying the 'clientget' function
 client.hget = util.promisify(client.hget);
