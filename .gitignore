@@ -3,5 +3,7 @@ nohup.out
 
 dev.js
 
+..bfg-report/
+bfg-1.13.0.jar
 
 BlogsterDev.code-workspace
