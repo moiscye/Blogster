@@ -1,26 +1,20 @@
-const pupp = require("puppeteer");
-let browser, page;
+const Page = require("./helpers/page");
+let page;
 
 beforeEach(async () => {
-  //initialing the browser
-  browser = await pupp.launch({
-    headless: true
-  });
-
-  //creating a new page
-  page = await browser.newPage();
+  page = await Page.build();
 
   //navigating to localhost:3000
   await page.goto("http://localhost:3000/");
 });
 
 afterEach(async () => {
-  await browser.close();
+  await page.close();
 });
 
 test("Header should have the correct text", async () => {
   //fetching an element
-  const logo = await page.$eval("a.brand-logo", el => el.innerHTML);
+  const logo = await page.getContentsOf("a.brand-logo");
 
   expect(logo).toEqual("Blogster");
 });
@@ -31,49 +25,10 @@ test("clicking login start oauth flow", async () => {
   expect(url).toMatch(/accounts\.google\.com/);
 });
 
-test.only("when signed in, show the log out button", async () => {
-  //id from User stored in MongoDB
-  const id = "5dc8e2de93bac55d6879db0e";
-
-  //converting long string into a passport user
-  const Buffer = require("safe-buffer").Buffer;
-
-  //passport object
-  const sessionObject = {
-    passport: {
-      user: id
-    }
-  };
-
-  //making the string that we can see in the Header of the request
-  const sessionString = Buffer.from(JSON.stringify(sessionObject)).toString(
-    "base64"
-  );
-
-  //this library is installed as  a dependency with cookie-session
-  const Keygrip = require("keygrip");
-
-  //requiring the keys file from config/
-  const keys = require("../config/keys");
-
-  //instanciating a new Keygrip Object with the cookie key we defined
-  const keygrip = new Keygrip([keys.cookieKey]);
-
-  //creating the sign string
-  const sessionSig = keygrip.sign("express:sess=" + sessionString);
-
-  //setting the cookies so we can fake the google log in
-  await page.setCookie({ name: "express:sess", value: sessionString });
-  await page.setCookie({ name: "express:sess.sig", value: sessionSig });
-
-  //refreshing the page
-  await page.goto("http://localhost:3000/");
-
-  //waiting so the page render the html
-  await page.waitFor('a[href="/api/logout"]');
-
+test("when signed in, show the log out button", async () => {
+  await page.login();
   //fetching the button
-  const logout = await page.$eval('a[href="/api/logout"]', el => el.innerHTML);
+  const text = await page.getContentsOf('a[href="/api/logout"]');
 
-  expect(logout).toEqual("Logout");
+  expect(text).toEqual("Logout");
 });
